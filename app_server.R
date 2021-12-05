@@ -137,12 +137,8 @@ server <- function(input, output) {
   })
   output$plot <- renderPlotly({
     fuels_emit_plot <- ggplot(data = fuels_co2_emit()) +
-      geom_line(aes(y = !!as.name(input$fuel_type), x = year, colour = names(input$fuel_type))) +
-      labs(x = "Year", y = "CO2 Emission Amount", title = "CO2 Emission Amount By Years (Coal, Gas, Oil)") +
-      scale_color_manual(
-        name = "line of",
-        values = c("Coal" = "red", "Gas" = "blue", "Oil" = "green")
-      )
+      geom_line(aes(y = !!as.name(input$fuel_type), x = year)) +
+      labs(x = "Year", y = "CO2 Emission Amount", title = "CO2 Emission Amount By Years (Coal, Gas, Oil)")
     fuels_emit_plotly <- ggplotly(fuels_emit_plot)
     return(fuels_emit_plotly)
   })
