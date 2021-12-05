@@ -112,21 +112,22 @@ server <- function(input, output) {
   # plot analysis: Create a plot analyzing trends of CO2 emission amount from coal,
   # gas, and oil from 1850 and 2020.
   # Here, we do the data preparation, and will do the plotting below.
-  fuels_co2_emit <- co2_data %>%
+  fuels_co2_emit <- reactive({
+    co2_data %>%
     group_by(year) %>%
     filter(year >= input$year_s[1] & year <= input$year_s[2]) %>%
     summarise(coal_t = sum(coal_co2, na.rm = TRUE),
               gas_t = sum(gas_co2, na.rm = TRUE),
               oil_t = sum(oil_co2, na.rm = TRUE)) %>%
     select(year, coal_t, gas_t, oil_t)
+  })
   
   output$plot_all <- renderPlotly({
-    fuels_emit_plot_all <- ggplot(data = fuels_co2_emit) +
+    fuels_emit_plot_all <- ggplot(data = fuels_co2_emit()) +
       geom_line(aes(y = coal_t, x = year, colour = "Coal")) +
       geom_line(aes(y = gas_t, x = year, colour = "Gas")) +
       geom_line(aes(y = oil_t, x = year, colour = "Oil")) +
-      labs(x = "Year", y = "CO2 Emission Amount", title = "CO2 Emission Amount By Years, 
-       Coal, Gas, Oil") +
+      labs(x = "Year", y = "CO2 Emission Amount", title = "CO2 Emission Amount By Years (Coal, Gas, Oil)") +
       scale_color_manual(
         name = "line of",
         values = c("Coal" = "red", "Gas" = "blue", "Oil" = "green")
@@ -135,9 +136,9 @@ server <- function(input, output) {
     return(fuels_emit_plotly_all)
   })
   output$plot <- renderPlotly({
-    fuels_emit_plot <- ggplot(data = fuels_co2_emit) +
+    fuels_emit_plot <- ggplot(data = fuels_co2_emit()) +
       geom_line(aes(y = !!as.name(input$fuel_type), x = year, colour = names(input$fuel_type))) +
-      labs(x = "Year", y = "CO2 Emission Amount", title = "CO2 Emission Amount By Years, Coal, Gas, Oil") +
+      labs(x = "Year", y = "CO2 Emission Amount", title = "CO2 Emission Amount By Years (Coal, Gas, Oil)") +
       scale_color_manual(
         name = "line of",
         values = c("Coal" = "red", "Gas" = "blue", "Oil" = "green")
